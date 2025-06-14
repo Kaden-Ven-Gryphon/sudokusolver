@@ -18,12 +18,14 @@ namespace SudokuSolver
     {
         public MainWindow()
         {
-            SudokuBoard sudokuBoard = new SudokuBoard();
+            Solver sudokuBoard = new Solver();
             sudokuBoard.LoadBoard("testboard.txt");
             sudokuBoard.ConsolePrintBoard();
-            sudokuBoard.FillBoardWithPencilMarks();
-            sudokuBoard.CleanPencilMarksFromBoard();
             sudokuBoard.ConsolePrintPencilBoard();
+            sudokuBoard.Solve();
+            sudokuBoard.ConsolePrintBoard();
+            sudokuBoard.ConsolePrintPencilBoard();
+            Console.WriteLine("The Board is valid: {0}", sudokuBoard.CheckIsBoardValid());
             InitializeComponent();
         }
     }

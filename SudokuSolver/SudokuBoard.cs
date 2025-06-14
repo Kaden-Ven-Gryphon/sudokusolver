@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Xps.Serialization;
 
 namespace SudokuSolver
 {
@@ -132,8 +133,87 @@ namespace SudokuSolver
             return false;
         }
 
+        // check if list is squential, helper function for the Check functions
+        private bool isSequential(List<int> l)
+        {
+            for (int i = 1; i < l.Count; i++)
+            {
+                if (l[i-1]+1 != l[i]) { return false; }
+            }
+            return true;
+        }
+
+        // Check if row is valid
+        public bool CheckIsRowValid(int row)
+        {
+            List<int> values = new List<int>();
+
+            // get list of all values in row
+            for (int i = 0; i < 9; i++)
+            {
+                values.Add(GetCellValue(i, row));
+            }
+
+            values.Sort();
+
+            if (values.Count != 9) { return false; }
+            if (values[0] != 1) { return false; }
+            return isSequential(values);
+        }
+
+        // Check if colm is valid
+        public bool CheckIsColmValid(int colm)
+        {
+            List<int> values = new List<int>();
+
+            // get list of all values in row
+            for (int i = 0; i < 9; i++)
+            {
+                values.Add(GetCellValue(colm, i));
+            }
+
+            values.Sort();
+
+            if (values.Count != 9) { return false; }
+            if (values[0] != 1) { return false; }
+            return isSequential(values);
+        }
+
+        // Check if box is valid
+        public bool CheckIsBoxValid(int box)
+        {
+            List<int> values = new List<int>();
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    values.Add(GetCellValue(i + ((box % 3) * 3), j + ((box / 3) * 3)));
+                }
+            }
+
+            values.Sort();
+
+            if (values.Count != 9) { return false; }
+            if (values[0] != 1) { return false; }
+            return isSequential(values);
+        }
+
+        // Check if board is valid
+        public bool CheckIsBoardValid()
+        {
+            bool isValid = true;
+            for (int i = 0; i < 9; i++)
+            {
+                if (!CheckIsRowValid(i)) { isValid = false; Console.WriteLine("Row {0} invalid", i); break; }
+                if (!CheckIsColmValid(i)) { isValid = false; Console.WriteLine("Colm {0} invalid", i); break; }
+                if (!CheckIsBoxValid(i)) { isValid = false; Console.WriteLine("Box {0} invalid", i); break; }
+            }
+            return isValid;
+        }
+
         // Add pencil mark to list for cell
-        public bool AddPencilMarkToBox(int x, int y, int mark)
+        public bool AddPencilMarkToCell(int x, int y, int mark)
         {
             if (!CheckDoesCellContainPencilMark(x, y, mark) && GetCellValue(x, y) == 0)
             {
@@ -149,12 +229,54 @@ namespace SudokuSolver
             return _pencilMarks[getindex(x, y)].Remove(mark);
         }
 
+        // Clear all pencil marks from cell
+        public void ClearPencilMarkFromCell(int x, int y)
+        {
+            _pencilMarks[getindex(x,y)].Clear();
+        }
+
+        // Remove pencil mark from row
+        public bool RemovePencilMarkFromRow(int row, int mark)
+        {
+            bool markExist = true;
+            for (int i = 0; i < 9; i++)
+            {
+                if (RemovePencilMarkFromCell(i, row, mark) == false) { markExist = false; }
+            }
+            return markExist;
+        }
+
+        // Remove pencil mark from colm
+        public bool RemovePencilMarkFromColm(int col, int mark)
+        {
+            bool markExist = true;
+            for (int i = 0; i < 9; i++)
+            {
+                if (RemovePencilMarkFromCell(col, i, mark) == false) { markExist = false; }
+            }
+            return markExist;
+        }
+
+        //Remove pencil mark from box
+        public bool RemovePencilMarkFromBox(int box, int mark)
+        {
+            bool markExist = true;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    if (RemovePencilMarkFromCell(i + ((box % 3) * 3), j + ((box / 3) * 3), mark) == false) { markExist = false; }
+                }
+            }
+            return markExist;
+        }
+
         // Fill each none filled cell with all pencil marks
         public void FillCellPencilMarks(int x, int y)
         {
             for (int i = 1; i <= 9; i++)
             {
-                AddPencilMarkToBox(x, y, i);
+                AddPencilMarkToCell(x, y, i);
             }
         }
 
@@ -194,6 +316,16 @@ namespace SudokuSolver
                     CleanPencilMarksFromCell(i, j);
                 }
             }
+        }
+
+        // Set the value of the cell
+        public void SetCellValue(int x, int y, int value)
+        {
+            _board[getindex(x, y)] = value;
+            ClearPencilMarkFromCell(x, y);
+            RemovePencilMarkFromBox(GetBoxNumFromCord(x, y), value);
+            RemovePencilMarkFromColm(x, value);
+            RemovePencilMarkFromRow(y, value);
         }
 
         // Print the current Board state to console
