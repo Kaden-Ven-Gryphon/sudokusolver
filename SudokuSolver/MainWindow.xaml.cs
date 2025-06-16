@@ -22,8 +22,13 @@ namespace SudokuSolver
             sudokuBoard.LoadBoard("testboard.txt");
             sudokuBoard.ConsolePrintBoard();
             sudokuBoard.ConsolePrintPencilBoard();
-            sudokuBoard.Solve();
+            //sudokuBoard.Solve();
+            sudokuBoard.FillBoardWithPencilMarks();
+            sudokuBoard.CleanPencilMarksFromBoard();
+            sudokuBoard.ConsolePrintPencilBoard();
             sudokuBoard.ConsolePrintBoard();
+            sudokuBoard.ConsolePrintPencilBoard();
+            sudokuBoard.ResolveDoublesForBoard();
             sudokuBoard.ConsolePrintPencilBoard();
             Console.WriteLine("The Board is valid: {0}", sudokuBoard.CheckIsBoardValid());
             InitializeComponent();

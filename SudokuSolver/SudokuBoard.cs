@@ -68,6 +68,15 @@ namespace SudokuSolver
             return x + (y * 9);
         }
 
+        // Get cords based on box num and box local row colm cord
+        public (int, int) GetCordFromBoxAndLocalCord(int x, int y, int box)
+        {
+            int row = ((box / 3) * 3) + x;
+            int col = ((box % 3) * 3) + y;
+
+            return (col, row);
+        }
+
         // get box number from cords
         public int GetBoxNumFromCord(int x, int y)
         {

@@ -59,7 +59,7 @@ namespace SudokuSolver
                                 if (RemovePencilMarkFromCell(k, row, pencilList[1])) { changesMade = true; }
                             }
                         }
-                        return changesMade;
+                        if (changesMade) { return changesMade; }
                     }
                 }
             }
@@ -95,10 +95,61 @@ namespace SudokuSolver
                                 if (RemovePencilMarkFromCell(colm, k, pencilList[1])) { changesMade = true; }
                             }
                         }
-                        return changesMade;
+                        if (changesMade) { return changesMade; }
                     }
                 }
             }
+            return changesMade;
+        }
+
+        // Check for basic double pairs in boxes
+        // returns true if changes where made to pencil marks
+        public bool ResolveDoublesForBox(int box)
+        {
+            bool changesMade = false;
+
+            // Looping through the first list to compare from
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j =0; j < 3; j++)
+                {
+                    // Get first comparitor
+                    var (col, row) = GetCordFromBoxAndLocalCord(i, j, box);
+                    var pencilList = GetCellPencil(col, row);
+                    if (pencilList.Count != 2 ) { continue; }
+
+                    for (int k = 0; k < 3; k++)
+                    {
+                        for (int l = 0; l < 3; l++)
+                        {
+                            // Do not compare the same cell aginst its self
+                            if ( i == k && j == l ) { continue; }
+
+                            var (colComp, rowComp) = GetCordFromBoxAndLocalCord(k, l, box);
+                            var comparedList = GetCellPencil(colComp, rowComp);
+                            if (comparedList.Count == 2 && comparedList.All(pencilList.Contains))
+                            {
+                                // Remove the paired pencil marks from other cells in box
+                                for (int m = 0; m < 3; m++)
+                                {
+                                    for (int n = 0; n < 3; n++)
+                                    {
+                                        // makesure not to remove marks for original double
+                                        if (!((m == i && n == j) || (m == k && n == l)))
+                                        {
+                                            var (colRemove, rowRemove) = GetCordFromBoxAndLocalCord(m, n, box);
+                                            if (RemovePencilMarkFromCell(colRemove, rowRemove, pencilList[0])) { changesMade = true; }
+                                            if (RemovePencilMarkFromCell(colRemove, rowRemove, pencilList[1])) { changesMade = true; }
+                                        }
+                                    }
+                                }
+                                if (changesMade) { return changesMade; }
+                            }
+                        }
+                    }// loop for second comparator
+                }
+            }// loop for first comparator
+
             return changesMade;
         }
 
@@ -111,6 +162,7 @@ namespace SudokuSolver
             {
                 if (ResolveDoublesForRow(i)) { changesMade = true; }
                 if (ResolveDoublesForColm(i)) { changesMade = true; }
+                if (ResolveDoublesForBox(i)) { changesMade = true; }
             }
 
             return changesMade;
