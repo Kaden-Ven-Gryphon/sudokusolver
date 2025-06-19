@@ -16,9 +16,10 @@ namespace SudokuSolver
     /// </summary>
     public partial class MainWindow : Window
     {
+        Solver sudokuBoard;
         public MainWindow()
         {
-            Solver sudokuBoard = new Solver();
+            sudokuBoard = new Solver();
             sudokuBoard.LoadBoard("testboard.txt");
             sudokuBoard.ConsolePrintBoard();
             sudokuBoard.ConsolePrintPencilBoard();
@@ -30,8 +31,23 @@ namespace SudokuSolver
             sudokuBoard.ConsolePrintPencilBoard();
             sudokuBoard.ResolveDoublesForBoard();
             sudokuBoard.ConsolePrintPencilBoard();
-            Console.WriteLine("The Board is valid: {0}", sudokuBoard.CheckIsBoardValid());
+            
             InitializeComponent();
+        }
+
+        private void Button_Click_Solve(object sender, RoutedEventArgs e)
+        {
+            sudokuBoard.Solve();
+        }
+
+        private void Button_Click_Fill_Singles(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Button_Click_Check(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("The Board is valid: {0}", sudokuBoard.CheckIsBoardValid());
         }
     }
 }

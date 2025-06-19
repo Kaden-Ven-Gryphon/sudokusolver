@@ -7,6 +7,31 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Border BorderBrush="Black" BorderThickness="1" Margin="10,31,352,19">
+            <Grid>
+                <StackPanel>
+                    <TextBlock>Board</TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Sudoku Solver" VerticalAlignment="Top" Width="182"/>
+        <Grid Margin="471,31,10,93">
+            <Border BorderBrush="Black" BorderThickness="1" Margin="0,0,159,0">
+                <StackPanel>
+                    <Button Content="Solve" Click="Button_Click_Solve"/>
+                    <Button Content="Fill Singles" Click="Button_Click_Fill_Singles"/>
+                    <Button Content="Check" Click="Button_Click_Check"/>
+                </StackPanel>
+
+            </Border>
+            <Border BorderBrush="Black" BorderThickness="1" Margin="165,0,0,0">
+                <StackPanel>
+                    <TextBlock TextWrapping="Wrap" Text="Puzzles"/>
+                    <ListBox d:ItemsSource="{d:SampleData ItemCount=5}" Height="164" Width="148"/>
+                    <Button Content="Open"/>
+                </StackPanel>
+            </Border>
+        </Grid>
 
     </Grid>
 </Window>
