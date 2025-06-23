@@ -18,7 +18,8 @@ namespace SudokuSolver
 	{
 		Solver sudokuBoard;
 		PuzzleFileManager puzzleFileManager;
-		Grid boardGrid;
+		
+		BoardWpf boardWpf;
 
 		public MainWindow()
 		{
@@ -26,21 +27,41 @@ namespace SudokuSolver
 			puzzleFileManager = new PuzzleFileManager("C:\\Users\\NoxNo\\Desktop\\Projects\\SudokuSolver\\TestBoards");
 			puzzleFileManager.ScanPath();
 
+			boardWpf = new BoardWpf();
+
 			sudokuBoard.LoadBoard("testboard.txt");
 			sudokuBoard.ConsolePrintBoard();
 			sudokuBoard.ConsolePrintPencilBoard();
-			//sudokuBoard.Solve();
-			sudokuBoard.FillBoardWithPencilMarks();
-			sudokuBoard.CleanPencilMarksFromBoard();
+			
 			sudokuBoard.ConsolePrintPencilBoard();
 			sudokuBoard.ConsolePrintBoard();
-			sudokuBoard.ConsolePrintPencilBoard();
-			sudokuBoard.ResolveDoublesForBoard();
-			sudokuBoard.ConsolePrintPencilBoard();
 			
 			InitializeComponent();
 			LoadList();
-			InitBoardGrid(9, 9, 3);
+			Board_Viewbox.Child = boardWpf.BoardGrid;
+
+			RefreshBoardState();
+			//InitBoardGrid(9, 9, 3);
+		}
+
+		private void RefreshBoardState()
+		{
+			for (int i = 0; i < 9; i++)
+			{
+				for (int j = 0; j < 9; j++)
+				{
+					boardWpf.FillCellValue(i, j, sudokuBoard.GetCellValue(j, i));
+					boardWpf.SetCellPencil(i, j, sudokuBoard.GetCellPencil(j, i));
+					if(sudokuBoard.CheckIsCellGiven(j, i))
+					{
+						boardWpf.SetCellForegroundColor(i, j, Colors.Blue);
+					}
+					else
+					{
+						boardWpf.SetCellForegroundColor(i, j, Colors.Black);
+					}
+				}
+			}
 		}
 
 		private void LoadList()
@@ -48,65 +69,41 @@ namespace SudokuSolver
 			puzzleList.ItemsSource = puzzleFileManager.GetPuzzleNames();
 		}
 
-		private void InitBoardGrid(int width, int hight, int bold)
-		{
-			boardGrid = new Grid();
-			boardGrid.Children.Clear();
-			Board_Border.Child = boardGrid;
-
-			for (int i = 0; i < width; i++)
-			{
-				boardGrid.ColumnDefinitions.Add(new ColumnDefinition());
-			}
-			for (int i =0; i < hight; i++)
-			{
-				boardGrid.RowDefinitions.Add(new RowDefinition());
-			}
-
-			for (int i = 0; i < hight; i++)
-			{
-				for (int j = 0; j < width; j++)
-				{
-					var cell = new Border();
-					cell.BorderThickness = new Thickness(1);
-					cell.BorderBrush = Brushes.Black;
-					boardGrid.Children.Add(cell);
-					Grid.SetRow(cell, i);
-					Grid.SetColumn(cell, j);
-				}
-			}
-
-			for (int i =0; i < hight/bold; i++)
-			{
-				for(int j = 0;j < width/bold; j++)
-				{
-					var cell = new Border();
-					cell.BorderThickness = new Thickness(4);
-					cell.BorderBrush = Brushes.Black;
-					boardGrid.Children.Add(cell);
-					Grid.SetRow(cell, i*bold);
-					Grid.SetColumn(cell, j* bold);
-					Grid.SetRowSpan(cell, bold);
-					Grid.SetColumnSpan(cell, bold);
-				}
-			}
-		}
-
 		private void Button_Click_Open_Puzzle(object sender, RoutedEventArgs e)
 		{
-			var selectedPuzzle = puzzleList.SelectedItem;
-			Console.WriteLine(selectedPuzzle.ToString());
+			var selectedPuzzle = puzzleList.SelectedItem ?? "";
+			var puzzlePath = puzzleFileManager.GetPuzzlePath(selectedPuzzle.ToString() ?? "") ?? "NULL";
+			sudokuBoard.LoadBoard(puzzlePath);
+			RefreshBoardState();
+			Console.WriteLine(puzzlePath);
+		}
+		
+		private void Button_Click_Fill_Pencil_Marks(object sender, RoutedEventArgs e)
+		{
+			sudokuBoard.FillBoardWithPencilMarks();
+			sudokuBoard.CleanPencilMarksFromBoard();
+			RefreshBoardState();
+		}
+
+		private void Button_Click_Fill_Singles(object sender, RoutedEventArgs e)
+		{
+			sudokuBoard.FillSinglePencilMarksAsValue();
+			RefreshBoardState();
+		}
+
+		private void Button_Click_Doubles(object sender, RoutedEventArgs e)
+		{
+			sudokuBoard.ResolveDoublesForBoard();
+			RefreshBoardState();
 		}
 
 		private void Button_Click_Solve(object sender, RoutedEventArgs e)
 		{
 			sudokuBoard.Solve();
+			RefreshBoardState();
 		}
 
-		private void Button_Click_Fill_Singles(object sender, RoutedEventArgs e)
-		{
-
-		}
+		
 
 		private void Button_Click_Check(object sender, RoutedEventArgs e)
 		{

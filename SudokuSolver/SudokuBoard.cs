@@ -48,6 +48,7 @@ namespace SudokuSolver
 					for (int j = 0; j < line.Length; j++)
 					{
 						_board[i] = line[j] - '0';
+						_pencilMarks[i].Clear();
 						i++;
 					}
 					line = sr.ReadLine();

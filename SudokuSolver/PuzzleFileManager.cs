@@ -56,5 +56,16 @@ namespace SudokuSolver
 			}
 			return names;
 		}
+
+		// Returns string of puzzle file path
+		public string? GetPuzzlePath(string puzzleName)
+		{
+			var puzzle = puzzleFiles.Find(i => i.Name == puzzleName);
+			if (puzzle != null && puzzle.Path != null && puzzle.Path != "")
+			{
+				return puzzle.Path;
+			}
+			else { return null; }
+		}
 	}
 }
