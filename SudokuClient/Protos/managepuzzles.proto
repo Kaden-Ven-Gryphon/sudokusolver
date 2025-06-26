@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcSolverClient";
+
+package managepuzzles;
+
+// The puzzle manager service definition.
+service PuzzleManager {
+	// Gets list of avalible files
+	rpc GetPuzzleList (PathRequest) returns (ListReply);
+}
+
+// The request message containing the path to use.
+message PathRequest {
+	string path = 1;
+}
+
+// The response message containing the list of file names and ids
+message ListReply {
+	map<int32, string> puzzleFiles = 1;
+}

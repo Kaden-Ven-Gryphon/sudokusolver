@@ -7,6 +7,80 @@
 		mc:Ignorable="d"
 		Title="MainWindow" Height="450" Width="800">
 	<Grid>
-		<Button Click="ButtonClickAsync">This is a button</Button>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="25"/>
+			<RowDefinition />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="75*"/>
+			<ColumnDefinition Width="25*" MinWidth="200" MaxWidth="400" />
+		</Grid.ColumnDefinitions>
+
+		<TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="Sudoku Solver" VerticalAlignment="Top" Width="182"/>
+
+		<Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="10">
+			<Grid x:Name="Board_Container_Grid">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="2*" MinHeight="18" MaxHeight="25"/>
+					<RowDefinition Height="90*"/>
+				</Grid.RowDefinitions>
+				<TextBlock Grid.Row="0">Board</TextBlock>
+				<Viewbox Name="Board_Viewbox" Grid.Row="1" Margin="10"
+						
+						>
+					<TextBlock>
+					This is text
+					</TextBlock>
+				</Viewbox>
+			</Grid>
+		</Border>
+
+
+		<!-- User Menu Grid -->
+		<Grid Grid.Row="1" Grid.Column="1" Margin="10">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="80*"/>
+				<RowDefinition Height="20*"/>
+			</Grid.RowDefinitions>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="50*"/>
+				<ColumnDefinition Width ="50*"/>
+			</Grid.ColumnDefinitions>
+
+			<!-- Solver Buttons -->
+			<Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="5,0,5,0">
+				<StackPanel Margin="2,0,2,0">
+					<Button Content="Fill Pencil Marks" Click="Button_Click_Fill_Pencil_Marks"/>
+					<Button Content="Fill Singles" Click="Button_Click_Fill_Singles"/>
+					<Button Content="Doubles" Click="Button_Click_Doubles"/>
+					<Button Content="Solve" Click="Button_Click_Solve"/>
+					<Button Content="Check" Click="Button_Click_Check"/>
+				</StackPanel>
+			</Border>
+
+			<!-- Puzzle List -->
+			<Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" BorderThickness="1"
+				HorizontalAlignment="Stretch"
+				Width="auto"
+				Height="auto"
+				VerticalAlignment="Stretch"
+				Margin="5,0,5,0">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="18" />
+						<RowDefinition Height="85*" />
+						<RowDefinition Height="10*" MinHeight="20"/>
+					</Grid.RowDefinitions>
+					<TextBlock TextWrapping="Wrap" Text="Puzzles" Grid.Row="0" VerticalAlignment="Stretch" Height="auto"/>
+					<ListBox x:Name="puzzleList" d:ItemsSource="{d:SampleData ItemCount=5}" Grid.Row="1"/>
+					<Button Content="Open" Click="Button_Click_Open_Puzzle" Grid.Row="2"/>
+				</Grid>
+			</Border>
+
+			<!-- Console Out -->
+			<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BorderBrush="Black" BorderThickness="1" Margin="5,5,5,0">
+
+			</Border>
+		</Grid>
 	</Grid>
 </Window>

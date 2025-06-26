@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Protos\managepuzzles.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.31.1" />
     <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
     <PackageReference Include="Grpc.Tools" Version="2.72.0">
@@ -19,10 +23,7 @@
 
 	<ItemGroup>
 		<Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
+		<Protobuf Include="Protos\managepuzzles.proto" GrpcServices="Client" />
 	</ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Protos\" />
-  </ItemGroup>
 
 </Project>
