@@ -34,6 +34,9 @@ namespace SudokuClient
 		private int _boardBold = 3;
 		private BoardWpf _boardWpf = null!;
 
+		// puzzle lists
+		private List<PuzzleListEntryWpf> _puzzleList = null!;
+
 		// Entry point of the programs, and function that run on startup
 		#region Startup
 		/// <summary>
@@ -50,6 +53,7 @@ namespace SudokuClient
 			InitializeBoard(_boardHeight, _boardWidth, _boardBold);
 			RefreshBoardState();
 			GetPuzzleListAsync("C:\\Users\\NoxNo\\Desktop\\Projects\\SudokuSolver\\TestBoards");
+			Console.WriteLine(_puzzleList?.ToString());
 		}
 
 		/// <summary>
@@ -104,9 +108,18 @@ namespace SudokuClient
 		{
 			try
 			{
+				Console.WriteLine("Getting Puzzle List Async");
 				var reply = await _puzzleManageClient.GetPuzzleListAsync(
 					new PathRequest { Path = path });
-				Console.Write(reply.ToString());
+				if (reply != null)
+				{
+					_puzzleList = new List<PuzzleListEntryWpf>();
+					foreach (var x in reply.PuzzleFiles)
+					{
+						_puzzleList.Add(new PuzzleListEntryWpf(x.Key, x.Value));
+					}
+					UpdatePuzzleList();
+				}
 			}
 			catch (Exception ex)
 			{
@@ -119,10 +132,10 @@ namespace SudokuClient
 		{
 			var reply = await _client.SayHelloAsync(
 				new HelloRequest { Name = "GreeterClient" });
-			Console.WriteLine( reply.Message );
 		}
 
-		private void RefreshBoardState()
+        #region Update Functions
+        private void RefreshBoardState()
 		{
 			for (int i = 0; i < 9; i++)
 			{
@@ -142,12 +155,17 @@ namespace SudokuClient
 			}
 		}
 
-		private void LoadList()
+		private void UpdatePuzzleList()
 		{
-			//puzzleList.ItemsSource = puzzleFileManager.GetPuzzleNames();
+			Console.WriteLine("Update Puzzle List");
+			Console.WriteLine(_puzzleList);
+			puzzleList.ItemsSource = _puzzleList;
+			Console.WriteLine(puzzleList.ItemsSource);
 		}
+        #endregion
 
-		private void Button_Click_Open_Puzzle(object sender, RoutedEventArgs e)
+        #region Buttons
+        private void Button_Click_Open_Puzzle(object sender, RoutedEventArgs e)
 		{
 			var selectedPuzzle = puzzleList.SelectedItem ?? "";
 			//var puzzlePath = puzzleFileManager.GetPuzzlePath(selectedPuzzle.ToString() ?? "") ?? "NULL";
@@ -187,5 +205,6 @@ namespace SudokuClient
 		{
 			//Console.WriteLine("The Board is valid: {0}", sudokuBoard.CheckIsBoardValid());
 		}
-	}
+        #endregion
+    }
 }
