@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+option csharp_namespace = "GrpcSolverClient";
+
+package standardsolve;
+
+service StandardSolver {
+	rpc FillPencilMarks (BoardStateRequest) returns (BoardStateReply);
+	rpc FillNakedSingles (BoardStateRequest) returns (BoardStateReply);
+	rpc EliminateNakedDoubles (BoardStateRequest) returns (BoardStateReply);
+	rpc Solve (BoardStateRequest) returns (BoardStateReply);
+}
+
+message BoardStateRequest {
+	int32 columns = 1;
+	int32 rows = 2;
+	repeated int32 board = 3;
+	repeated int32 pencil_marks = 4;
+}
+
+message BoardStateReply {
+	int32 columns = 1;
+	int32 rows = 2;
+	repeated int32 board = 3;
+	repeated int32 pencil_marks = 4;
+	repeated string logs = 5;
+}

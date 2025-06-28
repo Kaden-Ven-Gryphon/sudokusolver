@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <None Remove="Protos\managepuzzles.proto" />
+    <None Remove="Protos\standardsolve.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
 	<ItemGroup>
 		<Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
 		<Protobuf Include="Protos\managepuzzles.proto" GrpcServices="Client" />
+		<Protobuf Include="Protos\standardsolve.proto" GrpcServices="Client" />
 	</ItemGroup>
 
 </Project>

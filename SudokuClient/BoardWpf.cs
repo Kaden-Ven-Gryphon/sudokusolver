@@ -13,15 +13,15 @@ namespace SudokuSolver
 	internal class BoardWpf
 	{
 		#region Properties
+		public int Rows { get; private set; }
+		public int Columns { get; private set; }
 		public Grid BoardGrid { get; private set; }
-
 		public int ValueFontSize { get; set; }
 		public int PencilFontSize { get; set; }
+		
 		#endregion
 
 		#region Private Atributes
-		private int _rows;
-		private int _columns;
 		private List<Border> borderList;
 		private List<TextBlock> cellTextList;
 		private List<Grid> pencilGrids;
@@ -29,7 +29,8 @@ namespace SudokuSolver
 		#endregion
 
 		#region Constructors
-		public BoardWpf()
+		
+		public BoardWpf(int columns, int rows, int bold)
 		{
 			BoardGrid = new Grid();
 			borderList = new List<Border>();
@@ -39,25 +40,17 @@ namespace SudokuSolver
 			ValueFontSize = 18;
 			PencilFontSize = 7;
 
-			initBoard(9, 9, 3);
+			Rows = rows;
+			Columns = columns;
+
+			initBoard(columns, rows, bold);
 		}
 
-		public BoardWpf(int width, int hight, int bold)
-		{
-			BoardGrid = new Grid();
-			borderList = new List<Border>();
-			cellTextList = new List<TextBlock>();
-			pencilGrids = new List<Grid>();
-			pencilTextList = new List<List<TextBlock>>();
-			ValueFontSize = 18;
-			PencilFontSize = 7;
-
-			initBoard(width, hight, bold);
-		}
+		public BoardWpf() : this(9, 9, 3) { }
 
 		// set the classes Board to a new grid filled
 		// with the borders and textblocks
-		private void initBoard(int width, int hight, int bold)
+		private void initBoard(int columns, int rows, int bold)
 		{
 			BoardGrid = new Grid();
 			BoardGrid.Width = 200;
@@ -66,18 +59,18 @@ namespace SudokuSolver
 			borderList = new List<Border>();
 			cellTextList = new List<TextBlock>();
 
-			for (int i = 0; i < width; i++)
+			for (int i = 0; i < columns; i++)
 			{
 				BoardGrid.ColumnDefinitions.Add(new ColumnDefinition());
 			}
-			for (int i = 0; i < hight; i++)
+			for (int i = 0; i < rows; i++)
 			{
 				BoardGrid.RowDefinitions.Add(new RowDefinition());
 			}
 
-			for (int i = 0; i < hight; i++)
+			for (int i = 0; i < rows; i++)
 			{
-				for (int j = 0; j < width; j++)
+				for (int j = 0; j < columns; j++)
 				{
 					// Make and add border for cell
 					var cell = new Border();
@@ -122,9 +115,9 @@ namespace SudokuSolver
 				}
 			}
 
-			for (int i = 0; i < hight / bold; i++)
+			for (int i = 0; i < rows / bold; i++)
 			{
-				for (int j = 0; j < width / bold; j++)
+				for (int j = 0; j < columns / bold; j++)
 				{
 					var cell = new Border();
 					cell.BorderThickness = new Thickness(2);
@@ -142,9 +135,9 @@ namespace SudokuSolver
 
 		#region Private Methods
 		// Get 1D array index from row and colm
-		private int getindex(int x, int y)
+		private int getindex(int row, int col)
 		{
-			return x + (y * 9);
+			return col + (row * Columns);
 		}
 		#endregion
 

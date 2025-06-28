@@ -7,7 +7,7 @@ package managepuzzles;
 // The puzzle manager service definition.
 service PuzzleManager {
 	// Gets list of avalible files
-	rpc GetPuzzleList (PathRequest) returns (ListReply);
+	rpc GetPuzzleListAndIds (PathRequest) returns (ListReply);
 	rpc GetPuzzle (PuzzleRequest) returns (PuzzleReply);
 }
 
@@ -32,9 +32,9 @@ message PuzzleReply {
 	string name = 2;
 	string description = 3;
 	int32 difficulty = 4;
-	int32 board_width = 5;
-	int32 board_hight = 6;
-	// repeated<int32> board = 7;
-	// repeated<int32> given = 8;
-	// repeated<int32> pencil_marks = 9;
+	int32 columns = 5;
+	int32 rows = 6;
+	repeated int32 board = 7;
+	repeated int32 given = 8;
+	repeated int32 pencil_marks = 9;
 }
