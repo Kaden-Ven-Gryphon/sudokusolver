@@ -76,6 +76,12 @@ namespace SudokuSolver
 			return row * Columns + col;
 		}
 
+		protected (int row, int col) ConvertIndexToCord(int index)
+		{
+			var row = index / Columns;
+			var col = index % Columns;
+			return (row, col);
+		}
 		
 
 		/// <summary>

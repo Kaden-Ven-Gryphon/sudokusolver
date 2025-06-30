@@ -181,6 +181,93 @@ namespace SudokuClient
 				return null;
 			}
 		}
+
+		/// <summary>
+		/// Requests the grpc backend to run FillNakedSingles
+		/// </summary>
+		/// <returns></returns>
+		private async Task<PuzzleBase?> RunFillNakedSingles()
+		{
+            try
+            {
+                Console.WriteLine("LOG: Running FillValidNakedSingles");
+                var reply = await _standardSolverClient.FillNakedSinglesAsync(
+                    PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
+                if (reply != null)
+                {
+                    //TODO MOVE TO UI LOG
+                    foreach (var log in reply.Logs)
+                    {
+                        Console.WriteLine(log);
+                    }
+                    var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
+
+                    return updatedBoard;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CLIENT: " + ex.Message);
+                return null;
+            }
+        }
+
+		/// <summary>
+		/// Requests grpc backend to run eliminatenakeddoubles
+		/// </summary>
+		/// <returns></returns>
+		private async Task<PuzzleBase?> RunEliminateNakedDoubles()
+		{
+            try
+            {
+                Console.WriteLine("LOG: Running FillValidNakedSingles");
+                var reply = await _standardSolverClient.EliminateNakedDoublesAsync(
+                    PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
+                if (reply != null)
+                {
+                    //TODO MOVE TO UI LOG
+                    foreach (var log in reply.Logs)
+                    {
+                        Console.WriteLine(log);
+                    }
+                    var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
+
+                    return updatedBoard;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CLIENT: " + ex.Message);
+                return null;
+            }
+        }
+
+		/// <summary>
+		/// Requests the grpc backend to check if the puzzle is solved
+		/// </summary>
+		/// <returns></returns>
+		private async Task<bool?> RunIsPuzzleSolved()
+		{
+            try
+            {
+                Console.WriteLine("LOG: Running IsPuzzleSolved");
+                var reply = await _standardSolverClient.BoardIsSolvedAsync(
+                    PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
+                if (reply != null)
+                {
+                    
+                    return reply.Solved;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("CLIENT: " + ex.Message);
+                return null;
+            }
+        }
 		#endregion
 
         #region Update Functions
@@ -252,17 +339,25 @@ namespace SudokuClient
 			}
 		}
 
-		private void Button_Click_Fill_Singles(object sender, RoutedEventArgs e)
+		private async void Button_Click_Fill_Naked_Singles(object sender, RoutedEventArgs e)
 		{
-			//sudokuBoard.FillSinglePencilMarksAsValue();
-			RefreshBoardState();
-		}
+            var newBoard = await RunFillNakedSingles();
+            if (newBoard != null)
+            {
+                _currentBoard.UpdateBoardFromBoard(newBoard);
+                RefreshBoardState();
+            }
+        }
 
-		private void Button_Click_Doubles(object sender, RoutedEventArgs e)
+		private async void Button_Click_Elminate_Naked_Doubles(object sender, RoutedEventArgs e)
 		{
-			//sudokuBoard.ResolveDoublesForBoard();
-			RefreshBoardState();
-		}
+            var newBoard = await RunEliminateNakedDoubles();
+            if (newBoard != null)
+            {
+                _currentBoard.UpdateBoardFromBoard(newBoard);
+                RefreshBoardState();
+            }
+        }
 
 		private void Button_Click_Solve(object sender, RoutedEventArgs e)
 		{
@@ -272,10 +367,14 @@ namespace SudokuClient
 
 
 
-		private void Button_Click_Check(object sender, RoutedEventArgs e)
+		private async void Button_Click_Check(object sender, RoutedEventArgs e)
 		{
-			//Console.WriteLine("The Board is valid: {0}", sudokuBoard.CheckIsBoardValid());
-		}
+			var solved = await RunIsPuzzleSolved();
+            if (solved != null)
+            {
+				Console.WriteLine("Puzzle is Solved = " +  solved);
+            }
+        }
         #endregion
     }
 }

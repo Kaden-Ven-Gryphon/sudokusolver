@@ -56,13 +56,28 @@ namespace GrpcSolver.Services
 		/// <returns></returns>
 		public override Task<BoardStateReply> FillNakedSingles(BoardStateRequest request, ServerCallContext context)
 		{
-			return Task.Run(() =>
-			{
-				BoardStateReply reply = new BoardStateReply();
+            try
+            {
+                _logger.LogInformation("Start: FillNakedSingles");
+                return Task.Run(() =>
+                {
+                    BoardStateReply reply;
+                    var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
 
-				return reply;
-			});
-		}
+                    solver.FillNakedSingles();
+
+                    reply = PuzzleMessageMapper.BoardStateReplyFromPuzzleBase(solver, solver.Logs);
+                    _logger.LogInformation("End: FillNakedSingles");
+                    return reply;
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                //TODO Change to null/error return
+                return Task.Run(() => { return new BoardStateReply(); });
+            }
+        }
 
 		/// <summary>
 		/// Use naked Doubles to eliminate pencil marks
@@ -72,13 +87,28 @@ namespace GrpcSolver.Services
 		/// <returns></returns>
 		public override Task<BoardStateReply> EliminateNakedDoubles(BoardStateRequest request, ServerCallContext context)
 		{
-			return Task.Run(() =>
-			{
-				BoardStateReply reply = new BoardStateReply();
+            try
+            {
+                _logger.LogInformation("Start: EliminateNakedDoubles");
+                return Task.Run(() =>
+                {
+                    BoardStateReply reply;
+                    var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
 
-				return reply;
-			});
-		}
+                    solver.EliminateNakedDoubles();
+
+                    reply = PuzzleMessageMapper.BoardStateReplyFromPuzzleBase(solver, solver.Logs);
+                    _logger.LogInformation("End: EliminateNakedDoubles");
+                    return reply;
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                //TODO Change to null/error return
+                return Task.Run(() => { return new BoardStateReply(); });
+            }
+        }
 
 		/// <summary>
 		/// Solve puzzle using any stratagies avalible
@@ -95,5 +125,31 @@ namespace GrpcSolver.Services
 				return reply;
 			});
 		}
-	}
+
+		public override Task<SolvedReply> BoardIsSolved(BoardStateRequest request, ServerCallContext context)
+		{
+            try
+            {
+                _logger.LogInformation("Start: BoardIsSolved");
+                return Task.Run(() =>
+                {
+                    SolvedReply reply = new SolvedReply();
+                    var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
+
+                    var isSolved = solver.PuzzleIsSolved();
+
+					reply.Solved = isSolved;
+
+                    _logger.LogInformation("End: BoardIsSolved");
+                    return reply;
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                //TODO Change to null/error return
+                return Task.Run(() => { return new SolvedReply(); });
+            }
+        }
+    }
 }

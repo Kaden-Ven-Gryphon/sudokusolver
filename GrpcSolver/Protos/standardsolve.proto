@@ -9,6 +9,7 @@ service StandardSolver {
 	rpc FillNakedSingles (BoardStateRequest) returns (BoardStateReply);
 	rpc EliminateNakedDoubles (BoardStateRequest) returns (BoardStateReply);
 	rpc Solve (BoardStateRequest) returns (BoardStateReply);
+	rpc BoardIsSolved (BoardStateRequest) returns (SolvedReply);
 }
 
 message BoardStateRequest {
@@ -24,4 +25,8 @@ message BoardStateReply {
 	repeated int32 board = 3;
 	repeated int32 pencil_marks = 4;
 	repeated string logs = 5;
+}
+
+message SolvedReply {
+	bool solved = 1;
 }
