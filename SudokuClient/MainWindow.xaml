@@ -5,10 +5,10 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:SudokuClient"
 		mc:Ignorable="d"
-		Title="MainWindow" Height="450" Width="800">
+		Title="Sudoku Solver" Height="450" Width="800">
 	<Grid>
 		<Grid.RowDefinitions>
-			<RowDefinition Height="25"/>
+			<RowDefinition Height="20"/>
 			<RowDefinition />
 		</Grid.RowDefinitions>
 		<Grid.ColumnDefinitions>
@@ -16,7 +16,12 @@
 			<ColumnDefinition Width="25*" MinWidth="200" MaxWidth="400" />
 		</Grid.ColumnDefinitions>
 
-		<TextBlock Grid.Row="0" HorizontalAlignment="Left" Margin="5" TextWrapping="Wrap" Text="Sudoku Solver" VerticalAlignment="Top" Width="182"/>
+		<Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+			<MenuItem Header="_File">
+				<MenuItem Header="_Path..." Click="Menu_Click_Path"/>
+			</MenuItem>
+		</Menu>
+		
 
 		<Border Grid.Row="1" Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="10">
 			<Grid x:Name="Board_Container_Grid">

@@ -31,6 +31,7 @@ namespace GrpcSolver.Services
 				ListReply reply = new ListReply();
 
 				_fileManager.Path = request.Path;
+				_fileManager.Clear();
 				_fileManager.ScanPath();
 				var dict = _fileManager.GetPuzzleNamesAndIds();
 

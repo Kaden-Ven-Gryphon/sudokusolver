@@ -145,11 +145,12 @@ namespace SudokuSolver
 		/// <param name="pencilMarks"></param>
 		public void LoadBoardFromList(List<int> board, List<int> given, List<int> pencilMarks)
 		{
-			if (board.Count != _board.Length || given.Count != _given.Length || pencilMarks.Count > _pencilMarks.Length*9)
+			if (board.Count != _board.Length || given.Count != _given.Length || pencilMarks.Count > _pencilMarks.Length*10)
 			{
-				throw new InvalidBoardSizeException("Loading board does not fit the dimentions of current board. Current: (" 
+				var message = "Loading board does not fit the dimentions of current board. Current: ("
 					+ _board.Length + ", " + _given.Length + ", " + _pencilMarks.Length + ") Loading: ("
-					+ board.Count + ", " + given.Count + ", " + pencilMarks.Count + ")");
+					+ board.Count + ", " + given.Count + ", " + pencilMarks.Count + ")";
+				throw new InvalidBoardSizeException(message);
 			}
 			for (int i = 0; i < _board.Length; i++)
 			{

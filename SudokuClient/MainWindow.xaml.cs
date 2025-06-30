@@ -13,6 +13,14 @@ using Grpc.Net.Client;
 using GrpcSolverClient;
 using SudokuSolver;
 using SudokuClient.Mappers;
+using Microsoft.Extensions.Logging;
+using Serilog.Context;
+using Serilog;
+using Serilog.Events;
+using Serilog.Expressions;
+using Serilog.Templates;
+using Serilog.Templates.Themes;
+using Serilog.Exceptions;
 
 
 namespace SudokuClient
@@ -22,6 +30,7 @@ namespace SudokuClient
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private readonly Serilog.ILogger _logger;
 		// grpc connection related values
 		private ChannelBase _channel = null!;
 		private Greeter.GreeterClient _client = null!;
@@ -48,6 +57,18 @@ namespace SudokuClient
 		/// </summary>
 		public MainWindow()
 		{
+			//Set up Logger
+			Log.Logger = new LoggerConfiguration()
+			.MinimumLevel.Debug()
+			.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+			.Enrich.FromLogContext()
+			.Enrich.WithExceptionDetails()
+			.WriteTo.Console(new ExpressionTemplate(
+				"[{@t:HH:mm:ss} {@l:w4}: {SourceContext}:{@p['scope']}]\n\t\t {@m}\n{@x}{#each k, v in @p['ExceptionDetail']} {k}: {v}\n{#end}", theme: TemplateTheme.Code))
+			//.WriteTo.Console(outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception} {Properties:j}")
+			.CreateLogger();
+			_logger = Log.ForContext<MainWindow>();
+
 			// Start grpc connection
 			StartConnection(_address, _port);
 
@@ -55,8 +76,7 @@ namespace SudokuClient
 
 			// Create board
 			InitializeBoard(_boardHeight, _boardWidth, _boardBold);
-			GetPuzzleListAsync("C:\\Users\\NoxNo\\Desktop\\Projects\\SudokuSolver\\TestBoards");
-			Console.WriteLine("LOG: " + _puzzleList?.ToString());
+			GetPuzzleListAsync(GlobalStaticData.PATH);
 		}
 
 		/// <summary>
@@ -66,17 +86,21 @@ namespace SudokuClient
 		/// <param name="port">Port number</param>
 		private void StartConnection(string address, int port)
 		{
+			using var log = LogContext.PushProperty("scope", "StartConnection");
 			try
 			{
+				_logger.Information("Starting Connection to GRPC at {address}:{port}", address, port);
 				var fullAddress = "https://" + address + ":" + port.ToString();
 				_channel = GrpcChannel.ForAddress(fullAddress);
 				_client = new Greeter.GreeterClient(_channel);
 				_puzzleManageClient = new PuzzleManager.PuzzleManagerClient(_channel);
 				_standardSolverClient = new StandardSolver.StandardSolverClient(_channel);
+				_logger.Information("Connection made.");
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				_logger.Error(ex, "Failed to make connection.");
+				ExceptionMessageBox(ex, "StartConnection");
 			}
 		}
 
@@ -89,30 +113,36 @@ namespace SudokuClient
 		/// <param name="bold">Number of cells before adding bold line</param>
 		private void InitializeBoard(int width, int hight, int bold)
 		{
+			using var log = LogContext.PushProperty("scope", "InitializeBoard");
 			try
 			{
+				_logger.Information("Initializing board with {rows} rows, {cols} columns", hight, width);
+
 				_boardWpf = new BoardWpf(width, hight, bold);
 				Board_Viewbox.Child = _boardWpf.BoardGrid;
+				_currentBoard = new PuzzleBase(9, 9);
+				RefreshBoardState();
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message);
+				_logger.Error(ex, "Failed to create board");
+				ExceptionMessageBox(ex, "InitializeBoard");
 			}
-		}
-
-		private async void Window_Loaded(object sender, RoutedEventArgs e)
-		{
-			//await Task.Run(GetPuzzleListAsync());
 		}
 		#endregion
 
 		// Function for getting data from the grpc backend
 		#region get grpc
+		/// <summary>
+		/// sets _puzzleList to as list of id, string pairs for puzzle names
+		/// </summary>
+		/// <param name="path"></param>
 		private async void GetPuzzleListAsync(string path)
 		{
+			using var log = LogContext.PushProperty("scope", "GetPuzzleListAsync");
 			try
 			{
-				Console.WriteLine("LOG: Getting Puzzle List Async");
+				_logger.Information("Getting Puzzle List Async");
 				var reply = await _puzzleManageClient.GetPuzzleListAndIdsAsync(
 					new PathRequest { Path = path });
 				if (reply != null)
@@ -124,10 +154,12 @@ namespace SudokuClient
 					}
 					UpdatePuzzleList();
 				}
+				_logger.Information("{count} puzzles in list", _puzzleList.Count);
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("CLIENT: " + ex.Message);
+				_logger.Error(ex, "Failed.");
+				ExceptionMessageBox(ex, "GetPuzzleListAsync");
 			}
 		}
 
@@ -138,16 +170,18 @@ namespace SudokuClient
 		/// <returns>May return null</returns>
 		private async Task<PuzzleBase?> GetPuzzleByIdAsync(int id)
 		{
+			using var log = LogContext.PushProperty("scope", "GetPuzzleByIdAsync");
 			try
 			{
-				Console.WriteLine("LOG: Getting Puzzle With ID:" + id + " Async");
+				_logger.Information("Getting Puzzle With ID: {id} Async", id);
 					var reply = await _puzzleManageClient.GetPuzzleAsync(
 						new PuzzleRequest { Id = id });
 					return PuzzleMessageMapper.PuzzleBaseFromPuzzleReply(reply);
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("CLIENT: " + ex.Message);
+				_logger.Error(ex, "Failed");
+				ExceptionMessageBox(ex, "GetPuzzleByIdAsync");
 				return null;
 			}
 		}
@@ -157,17 +191,18 @@ namespace SudokuClient
 		/// </summary>
 		private async Task<PuzzleBase?> RunFillValidPencilMarksAsync()
 		{
+			using var log = LogContext.PushProperty("scope", "RunFillValidPencilMarksAsync");
 			try
 			{
-				Console.WriteLine("LOG: Running FillValidPencilMarks");
+				_logger.Information("Running FillValidPencilMarksAsync");
 				var reply = await _standardSolverClient.FillPencilMarksAsync(
 					PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
 				if (reply != null)
 				{
 					//TODO MOVE TO UI LOG
-					foreach (var log in reply.Logs)
+					foreach (var solveLog in reply.Logs)
 					{
-						Console.WriteLine(log);
+						Console.WriteLine(solveLog);
 					}
 					var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
 
@@ -177,7 +212,8 @@ namespace SudokuClient
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show("CLIENT: " + ex.Message);
+				_logger.Warning(ex, "Failed");
+				ExceptionMessageBox(ex, "RunFillValidPencilMarksAsync");
 				return null;
 			}
 		}
@@ -375,6 +411,32 @@ namespace SudokuClient
 				Console.WriteLine("Puzzle is Solved = " +  solved);
             }
         }
-        #endregion
-    }
+		#endregion
+
+		#region Menus
+		private void Menu_Click_Path(object sender, RoutedEventArgs e)
+		{
+			var dialog = new ChangePathDialog();
+
+			bool? result = dialog.ShowDialog();
+
+			if (result == true)
+			{
+				GetPuzzleListAsync(GlobalStaticData.PATH);
+			}
+		}
+		#endregion
+
+		private void ExceptionMessageBox(Exception ex, string callingFunction)
+		{
+			string message = ex.Message;
+			var nextEx = ex.InnerException;
+			while (nextEx != null)
+			{
+				message += "\n" + nextEx.Message;
+				nextEx = nextEx.InnerException;
+			}
+			MessageBox.Show("CLIENT " + callingFunction + ": " + message);
+		}
+	}
 }

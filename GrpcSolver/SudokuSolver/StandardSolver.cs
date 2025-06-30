@@ -289,6 +289,7 @@ namespace GrpcSolver.SudokuSolver
 				{
 					if (ValueIsInRange(GetCellValue(row, col))) { continue; }
 					cellsModified++;
+					_pencilMarks[ConvertCordToIndex(row, col)].Clear();
 					for (int mark = MIN_VALUE; mark <= MAX_VALUE; mark++)
 					{
 						if(ValueIsValidInCell(row, col, mark))
@@ -405,17 +406,17 @@ namespace GrpcSolver.SudokuSolver
 				var indexs = GetListOfIndexsForBox(box);
 				for (int i = 0; i < indexs.Count-1; i++)
 				{
-					var pencilsA = _pencilMarks[i];
+					var pencilsA = _pencilMarks[indexs[i]];
 					if (pencilsA.Count != 2) { continue; }
 					for (int j = i+1; j < indexs.Count; j++)
 					{
-						var pencilsB = _pencilMarks[j];
+						var pencilsB = _pencilMarks[indexs[j]];
 						if (pencilsB.Count == 2 && pencilsA.All(pencilsB.Contains))
 						{
 							var influence = GetListOfIndexsForBox(box);
-							influence.Remove(i);
-							influence.Remove(j);
-							nakedDoubles.Add((i, j, influence));
+							influence.Remove(indexs[i]);
+							influence.Remove(indexs[j]);
+							nakedDoubles.Add((indexs[i], indexs[j], influence));
 						}
 					}
 				}

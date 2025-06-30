@@ -89,5 +89,13 @@ namespace SudokuSolver
 			}
 			else { return null;}
 		}
+
+		/// <summary>
+		/// Clears out list of puzzle files
+		/// </summary>
+		public void Clear()
+		{
+			_puzzleFiles.Clear();
+		}
 	}
 }

@@ -132,9 +132,17 @@ namespace SudokuClient.Mappers
 		/// <returns></returns>
 		public static PuzzleBase PuzzleBaseFromBoardStateRequest(BoardStateRequest board)
 		{
-			var puzzle = new PuzzleBase(board.Columns, board.Rows);
-			puzzle.LoadBoardFromList(board.Board.ToList(), Enumerable.Repeat(0, board.Columns * board.Rows).ToList(), board.PencilMarks.ToList());
-			return puzzle;
+			try
+			{
+				var puzzle = new PuzzleBase(board.Columns, board.Rows);
+				puzzle.LoadBoardFromList(board.Board.ToList(), Enumerable.Repeat(0, board.Columns * board.Rows).ToList(), board.PencilMarks.ToList());
+				return puzzle;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Mapper PuzzleBaseFromBoardStateRequest Error", ex);
+			}
+			
 		}
 
 		/// <summary>
@@ -144,9 +152,17 @@ namespace SudokuClient.Mappers
 		/// <returns></returns>
 		public static PuzzleBase? PuzzleBaseFromBoardStateReply(BoardStateReply board)
 		{
-			var puzzle = new PuzzleBase(board.Columns, board.Rows);
-			puzzle.LoadBoardFromList(board.Board.ToList(), Enumerable.Repeat(0, board.Columns * board.Rows).ToList(), board.PencilMarks.ToList());
-			return puzzle;
+			try
+			{
+				var puzzle = new PuzzleBase(board.Columns, board.Rows);
+				puzzle.LoadBoardFromList(board.Board.ToList(), Enumerable.Repeat(0, board.Columns * board.Rows).ToList(), board.PencilMarks.ToList());
+				return puzzle;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Mapper PuzzleBaseFromBoardStateReply Error", ex);
+			}
+			
 		}
 	}
 }
