@@ -1,6 +1,6 @@
-﻿using SudokuSolver;
+﻿using SudokuSolver.Base;
 
-namespace GrpcSolver.SudokuSolver
+namespace SudokuSolver.Solvers
 {
 	/// <summary>
 	/// Functions that act on the puzzle base that solve sudoku puzzles following
@@ -10,8 +10,8 @@ namespace GrpcSolver.SudokuSolver
 	/// </summary>
 	public class StandardSolver : PuzzleBase
 	{
-		private static int MIN_VALUE = 1;
-		private static int MAX_VALUE = 9;
+		private const int MIN_VALUE = 1;
+		private const int MAX_VALUE = 9;
 		public List<String> Logs {  get; private set; }
 		public List<String> LogsDebug { get; private set; }
 

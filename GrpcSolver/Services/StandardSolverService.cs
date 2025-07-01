@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using SudokuSolver.Base;
 using SudokuSolver;
 using GrpcSolver.Mappers;
 
@@ -30,7 +31,7 @@ namespace GrpcSolver.Services
 				return Task.Run(() =>
 				{
 					BoardStateReply reply;
-					var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
+					var solver = new SudokuSolver.Solvers.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
 
 					solver.FillAllValidPencilMarks();
 
@@ -41,7 +42,7 @@ namespace GrpcSolver.Services
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex.Message);
+				_logger.LogError(ex, "Failed");
 				//TODO Change to null/error return
 				return Task.Run(() => { return new BoardStateReply(); });
 			}
@@ -62,7 +63,7 @@ namespace GrpcSolver.Services
                 return Task.Run(() =>
                 {
                     BoardStateReply reply;
-                    var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
+                    var solver = new SudokuSolver.Solvers.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
 
                     solver.FillNakedSingles();
 
@@ -73,7 +74,7 @@ namespace GrpcSolver.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "Failed");
                 //TODO Change to null/error return
                 return Task.Run(() => { return new BoardStateReply(); });
             }
@@ -93,7 +94,7 @@ namespace GrpcSolver.Services
                 return Task.Run(() =>
                 {
                     BoardStateReply reply;
-                    var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
+                    var solver = new SudokuSolver.Solvers.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
 
                     solver.EliminateNakedDoubles();
 
@@ -104,7 +105,7 @@ namespace GrpcSolver.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "Failed");
                 //TODO Change to null/error return
                 return Task.Run(() => { return new BoardStateReply(); });
             }
@@ -134,7 +135,7 @@ namespace GrpcSolver.Services
                 return Task.Run(() =>
                 {
                     SolvedReply reply = new SolvedReply();
-                    var solver = new SudokuSolver.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
+                    var solver = new SudokuSolver.Solvers.StandardSolver(PuzzleMessageMapper.PuzzleBaseFromBoardStateRequest(request));
 
                     var isSolved = solver.PuzzleIsSolved();
 
@@ -146,7 +147,7 @@ namespace GrpcSolver.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                _logger.LogError(ex, "Failed");
                 //TODO Change to null/error return
                 return Task.Run(() => { return new SolvedReply(); });
             }

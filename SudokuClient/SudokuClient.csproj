@@ -9,8 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Protos\managepuzzles.proto" />
-    <None Remove="Protos\standardsolve.proto" />
+    <Compile Include="..\GrpcSolver\Mappers\PuzzleMessageMapper.cs" Link="Mappers\PuzzleMessageMapper.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -27,10 +26,22 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
   </ItemGroup>
 
-	<ItemGroup>
-		<Protobuf Include="Protos\greet.proto" GrpcServices="Client" />
-		<Protobuf Include="Protos\managepuzzles.proto" GrpcServices="Client" />
-		<Protobuf Include="Protos\standardsolve.proto" GrpcServices="Client" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SudokuSolver\SudokuSolver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Mappers\" />
+    <Folder Include="Protos\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="..\GrpcSolver\Protos\managepuzzles.proto">
+      <Link>Protos\managepuzzles.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\GrpcSolver\Protos\standardsolve.proto">
+      <Link>Protos\standardsolve.proto</Link>
+    </Protobuf>
+  </ItemGroup>
 
 </Project>

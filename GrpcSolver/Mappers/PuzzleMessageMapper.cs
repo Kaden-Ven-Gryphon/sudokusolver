@@ -1,5 +1,5 @@
-﻿using SudokuSolver;
-
+﻿using SudokuSolver.Base;
+using GrpcSolver;
 
 namespace GrpcSolver.Mappers
 {

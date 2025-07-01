@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using GrpcSolver.SudokuSolver.Exceptions;
 using SudokuSolver.Exceptions;
 
-namespace SudokuSolver
+namespace SudokuSolver.Base
 {
 	/// <summary>
 	/// Puzzle Base class.  This is mostly a struct that is used to store the state of a puzzle

@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using SudokuSolver.Exceptions;
 
-namespace SudokuSolver
+namespace SudokuSolver.Base
 {
 	/// <summary>
 	/// Adds path and other file specific details to a puzzle
 	/// </summary>
-	internal class PuzzleFile : PuzzleBase
+	public class PuzzleFile : PuzzleBase
 	{
 		
 		public string Path { get; set; }

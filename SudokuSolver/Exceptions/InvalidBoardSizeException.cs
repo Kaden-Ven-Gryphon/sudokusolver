@@ -1,4 +1,4 @@
-﻿namespace GrpcSolver.SudokuSolver.Exceptions
+﻿namespace SudokuSolver.Exceptions
 {
 	[Serializable]
 	public class InvalidBoardSizeException : Exception

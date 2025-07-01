@@ -1,6 +1,6 @@
 ﻿using Grpc.Core;
 using GrpcSolver;
-using SudokuSolver;
+using SudokuSolver.Base;
 using GrpcSolver.Mappers;
 
 namespace GrpcSolver.Services

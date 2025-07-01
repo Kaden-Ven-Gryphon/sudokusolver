@@ -5,22 +5,26 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SudokuSolver
+namespace SudokuSolver.Base
 {
-	internal class PuzzleFileManager
+	public class PuzzleFileManager
 	{
 		public string Path { get; set; }
 		public int Count { get; set; }
-		private List<PuzzleFile> puzzleFiles;
-		public PuzzleFileManager() {
-			Path = "";
-			puzzleFiles = new List<PuzzleFile>();
-		}
+
+		private int _nextId = 0;
+		private List<PuzzleFile> _puzzleFiles;
+
 		public PuzzleFileManager(string path)
 		{
 			Path = path;
-			puzzleFiles = new List<PuzzleFile>();
+			_puzzleFiles = new List<PuzzleFile>();
 		}
+		public PuzzleFileManager() : this("") { }
+
+		#region Private methods
+		
+		#endregion
 
 		// Seaches the path for txt files and loads the names of files into list
 		// Does not varify that they are valid puzzle files
@@ -34,25 +38,27 @@ namespace SudokuSolver
 				var subdir = Directory.GetDirectories(directories[i]).ToList();
 				var files = Directory.GetFiles(directories[i]).ToList();
 
+
 				foreach (var file in files)
 				{
 					var puzzle = new PuzzleFile();
 					puzzle.Path = file;
 					puzzle.Name = file.Split('\\').Last();
-					puzzleFiles.Add(puzzle);
+					puzzle.Id = _nextId++;
+					_puzzleFiles.Add(puzzle);
 				}
 
 				if (subdir != null) { directories.AddRange(subdir); }
 			}
 		}
 
-		// Returns a list of puzzle names
-		public List<string> GetPuzzleNames()
+		// Returns a dictionary of puzzle names and ids
+		public Dictionary<int, string> GetPuzzleNamesAndIds()
 		{
-			List<string> names = new List<string>();
-			foreach(var puzzle in puzzleFiles)
+			Dictionary<int, string> names = new Dictionary<int, string>();
+			foreach(var puzzle in _puzzleFiles)
 			{
-				names.Add(puzzle.Name);
+				names.Add(puzzle.Id, puzzle.Name);
 			}
 			return names;
 		}
@@ -60,12 +66,36 @@ namespace SudokuSolver
 		// Returns string of puzzle file path
 		public string? GetPuzzlePath(string puzzleName)
 		{
-			var puzzle = puzzleFiles.Find(i => i.Name == puzzleName);
+			var puzzle = _puzzleFiles.Find(i => i.Name == puzzleName);
 			if (puzzle != null && puzzle.Path != null && puzzle.Path != "")
 			{
 				return puzzle.Path;
 			}
 			else { return null; }
+		}
+
+		/// <summary>
+		/// Finds puzzle by its id
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns>A puzzle file, or null</returns>
+		public PuzzleFile? GetPuzzleById(int id)
+		{
+			var puzzle = _puzzleFiles.Find(i => i.Id == id);
+			if (puzzle != null)
+			{ 
+				if (puzzle.Stale) { puzzle.LoadFromDisk(); }
+				return puzzle;
+			}
+			else { return null;}
+		}
+
+		/// <summary>
+		/// Clears out list of puzzle files
+		/// </summary>
+		public void Clear()
+		{
+			_puzzleFiles.Clear();
 		}
 	}
 }

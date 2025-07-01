@@ -10,9 +10,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Grpc.Core;
 using Grpc.Net.Client;
-using GrpcSolverClient;
-using SudokuSolver;
-using SudokuClient.Mappers;
+using GrpcSolver;
+using SudokuSolver.Base;
+using GrpcSolver.Mappers;
 using Microsoft.Extensions.Logging;
 using Serilog.Context;
 using Serilog;
@@ -33,7 +33,6 @@ namespace SudokuClient
 		private readonly Serilog.ILogger _logger;
 		// grpc connection related values
 		private ChannelBase _channel = null!;
-		private Greeter.GreeterClient _client = null!;
 		private PuzzleManager.PuzzleManagerClient _puzzleManageClient = null!;
 		private StandardSolver.StandardSolverClient _standardSolverClient = null!;
 		private string _address = "localhost";
@@ -92,7 +91,6 @@ namespace SudokuClient
 				_logger.Information("Starting Connection to GRPC at {address}:{port}", address, port);
 				var fullAddress = "https://" + address + ":" + port.ToString();
 				_channel = GrpcChannel.ForAddress(fullAddress);
-				_client = new Greeter.GreeterClient(_channel);
 				_puzzleManageClient = new PuzzleManager.PuzzleManagerClient(_channel);
 				_standardSolverClient = new StandardSolver.StandardSolverClient(_channel);
 				_logger.Information("Connection made.");
