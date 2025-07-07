@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ namespace SudokuSolver.Base
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex);
+				throw new Exception("File Read Error", ex);
 			}
 			finally
 			{
@@ -82,6 +83,36 @@ namespace SudokuSolver.Base
 			}
 			LoadFromDisk(Path);
 
+		}
+
+		/// <summary>
+		/// Simple wrtie to disk, just uses name and given and assumes 9x9 needs to be replaced with json
+		/// </summary>
+		public void WriteToDiskSimple(string path)
+		{
+			//TODO dont use this function
+			StreamWriter sw = null!;
+			try
+			{
+				sw = new StreamWriter(path);
+
+				for (int i = 0; i < 9; i++)
+				{
+					for(int j = 0;j < 9; j++)
+					{
+						sw.Write(_given[ConvertCordToIndex(i, j)]);
+					}
+					sw.Write("\n");
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("FileWriting Error", ex);
+			}
+			finally
+			{
+				if (sw != null) sw.Close();
+			}
 		}
 	}
 }

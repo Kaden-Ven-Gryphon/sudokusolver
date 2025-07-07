@@ -222,30 +222,32 @@ namespace SudokuClient
 		/// <returns></returns>
 		private async Task<PuzzleBase?> RunFillNakedSingles()
 		{
-            try
-            {
-                Console.WriteLine("LOG: Running FillValidNakedSingles");
-                var reply = await _standardSolverClient.FillNakedSinglesAsync(
-                    PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
-                if (reply != null)
-                {
-                    //TODO MOVE TO UI LOG
-                    foreach (var log in reply.Logs)
-                    {
-                        Console.WriteLine(log);
-                    }
-                    var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
+			var log = LogContext.PushProperty("scope", "RunFillNakedSingles");
+			try
+			{
+				_logger.Information("LOG: Running FillValidNakedSingles");
+				var reply = await _standardSolverClient.FillNakedSinglesAsync(
+					PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
+				if (reply != null)
+				{
+					//TODO MOVE TO UI LOG
+					foreach (var puzzlelog in reply.Logs)
+					{
+						Console.WriteLine(puzzlelog);
+					}
+					var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
 
-                    return updatedBoard;
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("CLIENT: " + ex.Message);
-                return null;
-            }
-        }
+					return updatedBoard;
+				}
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.Warning(ex, "Failed");
+				ExceptionMessageBox(ex, "RunFillValidPencilMarksAsync");
+				return null;
+			}
+		}
 
 		/// <summary>
 		/// Requests grpc backend to run eliminatenakeddoubles
@@ -253,30 +255,32 @@ namespace SudokuClient
 		/// <returns></returns>
 		private async Task<PuzzleBase?> RunEliminateNakedDoubles()
 		{
-            try
-            {
-                Console.WriteLine("LOG: Running FillValidNakedSingles");
-                var reply = await _standardSolverClient.EliminateNakedDoublesAsync(
-                    PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
-                if (reply != null)
-                {
-                    //TODO MOVE TO UI LOG
-                    foreach (var log in reply.Logs)
-                    {
-                        Console.WriteLine(log);
-                    }
-                    var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
+			var log = LogContext.PushProperty("scope", "RunEliminateNakedDoubles");
+			try
+			{
+				_logger.Information("LOG: Running FillValidNakedSingles");
+				var reply = await _standardSolverClient.EliminateNakedDoublesAsync(
+					PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
+				if (reply != null)
+				{
+					//TODO MOVE TO UI LOG
+					foreach (var puzzleLog in reply.Logs)
+					{
+                        _logger.Information(puzzleLog);
+					}
+					var updatedBoard = PuzzleMessageMapper.PuzzleBaseFromBoardStateReply(reply);
 
-                    return updatedBoard;
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("CLIENT: " + ex.Message);
-                return null;
-            }
-        }
+					return updatedBoard;
+				}
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.Warning(ex, "Failed");
+				ExceptionMessageBox(ex, "RunFillValidPencilMarksAsync");
+				return null;
+			}
+		}
 
 		/// <summary>
 		/// Requests the grpc backend to check if the puzzle is solved
@@ -284,28 +288,67 @@ namespace SudokuClient
 		/// <returns></returns>
 		private async Task<bool?> RunIsPuzzleSolved()
 		{
-            try
-            {
-                Console.WriteLine("LOG: Running IsPuzzleSolved");
-                var reply = await _standardSolverClient.BoardIsSolvedAsync(
-                    PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
-                if (reply != null)
-                {
-                    
-                    return reply.Solved;
-                }
-                return null;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("CLIENT: " + ex.Message);
-                return null;
-            }
-        }
+			var log = LogContext.PushProperty("scope", "RunIsPuzzleSolved");
+			try
+			{
+				_logger.Information("LOG: Running IsPuzzleSolved");
+				var reply = await _standardSolverClient.BoardIsSolvedAsync(
+					PuzzleMessageMapper.BoardStateRequestromPuzzleBase(_currentBoard));
+				if (reply != null)
+				{
+					
+					return reply.Solved;
+				}
+				return null;
+			}
+			catch (Exception ex)
+			{
+				_logger.Warning(ex, "Failed");
+				ExceptionMessageBox(ex, "RunFillValidPencilMarksAsync");
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Sends info to grpc to backend to create puzzle file
+		/// </summary>
+		/// <returns></returns>
+		private async Task<bool?> SetImportPuzzle()
+		{
+			var log = LogContext.PushProperty("scope", "SetImportPuzzle");
+			try
+			{
+				_logger.Information("Running SetImportPuzzle");
+
+				var request = new ImportRequest();
+
+				request.Name = GlobalStaticData.LAST_PUZZLE_IMPORT_NAME;
+
+				//TODO fix the int parse tostring chain
+				foreach (char c in GlobalStaticData.LAST_PUZZLE_IMPORT_GIVEN)
+				{
+					if (c >= '0' && c <= '9') {  request.Given.Add(Int32.Parse(c.ToString())); }
+				}
+
+				var reply = await _puzzleManageClient.ImportPuzzleAsync(request);
+				if (reply != null)
+				{
+					return reply.Sucsess;
+				}
+
+				throw new Exception("Puzzle Failed to be imported");
+			}
+			catch (Exception ex)
+			{
+				_logger.Warning(ex, "Failed");
+				ExceptionMessageBox(ex, "SetImportPuzzle");
+				return null;
+			}
+		}
 		#endregion
 
-        #region Update Functions
-        private void RefreshBoardState()
+		#region Update Functions
+		private void RefreshBoardState()
 		{
 			if (_currentBoard == null) {  return; }
 			if (_currentBoard.Columns != _boardWpf.Columns && _currentBoard.Rows != _boardWpf.Rows)
@@ -335,16 +378,16 @@ namespace SudokuClient
 			Console.WriteLine("LOG: Update Puzzle List");
 			puzzleList.ItemsSource = _puzzleList;
 		}
-        #endregion
+		#endregion
 
-        #region Buttons
+		#region Buttons
 
 		/// <summary>
 		/// Gets the select puzzle name and id, gets puzzle from grpc backend
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-        private async void Button_Click_Open_Puzzle(object sender, RoutedEventArgs e)
+		private async void Button_Click_Open_Puzzle(object sender, RoutedEventArgs e)
 		{
 			var selectedPuzzle = puzzleList.SelectedItem as PuzzleListEntryWpf;
 			if (selectedPuzzle != null)
@@ -375,23 +418,23 @@ namespace SudokuClient
 
 		private async void Button_Click_Fill_Naked_Singles(object sender, RoutedEventArgs e)
 		{
-            var newBoard = await RunFillNakedSingles();
-            if (newBoard != null)
-            {
-                _currentBoard.UpdateBoardFromBoard(newBoard);
-                RefreshBoardState();
-            }
-        }
+			var newBoard = await RunFillNakedSingles();
+			if (newBoard != null)
+			{
+				_currentBoard.UpdateBoardFromBoard(newBoard);
+				RefreshBoardState();
+			}
+		}
 
 		private async void Button_Click_Elminate_Naked_Doubles(object sender, RoutedEventArgs e)
 		{
-            var newBoard = await RunEliminateNakedDoubles();
-            if (newBoard != null)
-            {
-                _currentBoard.UpdateBoardFromBoard(newBoard);
-                RefreshBoardState();
-            }
-        }
+			var newBoard = await RunEliminateNakedDoubles();
+			if (newBoard != null)
+			{
+				_currentBoard.UpdateBoardFromBoard(newBoard);
+				RefreshBoardState();
+			}
+		}
 
 		private void Button_Click_Solve(object sender, RoutedEventArgs e)
 		{
@@ -404,24 +447,60 @@ namespace SudokuClient
 		private async void Button_Click_Check(object sender, RoutedEventArgs e)
 		{
 			var solved = await RunIsPuzzleSolved();
-            if (solved != null)
-            {
+			if (solved != null)
+			{
 				Console.WriteLine("Puzzle is Solved = " +  solved);
-            }
-        }
+			}
+		}
 		#endregion
 
 		#region Menus
 		private void Menu_Click_Path(object sender, RoutedEventArgs e)
 		{
-			var dialog = new ChangePathDialog();
-
-			bool? result = dialog.ShowDialog();
-
-			if (result == true)
+			var log = LogContext.PushProperty("scope", "Menu_Click_Path");
+			try
 			{
-				GetPuzzleListAsync(GlobalStaticData.PATH);
+				var dialog = new ChangePathDialog();
+
+				bool? result = dialog.ShowDialog();
+
+				if (result == true)
+				{
+					GetPuzzleListAsync(GlobalStaticData.PATH);
+				}
 			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, "Setting Path Error");
+				ExceptionMessageBox(ex, "Menu_Click_Path");
+			}
+		}
+
+		private async void Menu_Click_Import(object sender, RoutedEventArgs e)
+		{
+			var log = LogContext.PushProperty("scope", "Menu_Click_Import");
+			try
+			{
+				var dialog = new ImportPuzzleDialog();
+
+				bool? result = dialog.ShowDialog();
+
+				if (result == true)
+				{
+					var succes = await SetImportPuzzle();
+					if (succes == true)
+					{
+						GetPuzzleListAsync(GlobalStaticData.PATH);
+                    }
+					
+				}
+			}
+			catch (Exception ex)
+			{
+				_logger.Error(ex, "Failed to import puzzle");
+				ExceptionMessageBox(ex, "Menu_Click_Path");
+			}
+			
 		}
 		#endregion
 

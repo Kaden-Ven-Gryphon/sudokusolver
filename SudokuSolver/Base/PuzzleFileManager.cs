@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SudokuSolver.Base
+﻿namespace SudokuSolver.Base
 {
 	public class PuzzleFileManager
 	{
@@ -30,7 +23,8 @@ namespace SudokuSolver.Base
 		// Does not varify that they are valid puzzle files
 		public void ScanPath()
 		{
-			var directories = Directory.GetDirectories(Path).ToList();
+			var directories = new List<string> { Path };
+			directories.AddRange(Directory.GetDirectories(Path).ToList());
 			if (directories == null) { return; }
 
 			for (int i = 0; i < directories.Count; i++)
@@ -96,6 +90,27 @@ namespace SudokuSolver.Base
 		public void Clear()
 		{
 			_puzzleFiles.Clear();
+		}
+
+		public void ImportNewPuzzleSimple(string puzzleName, int[] given)
+		{
+			var newPuzzle = new PuzzleFile();
+			newPuzzle.ResizeBoard(9, 9, false);
+			
+
+			newPuzzle.Name = puzzleName;
+			
+			for (int i = 0; i < 9;  i++)
+			{
+				for (int j = 0; j < 9; j++)
+				{
+					newPuzzle.SetCell(i, j, given[i*9+j], given[i*9+j], new List<int>());
+				}
+			}
+
+			newPuzzle.Path = Path + "\\" + puzzleName;
+
+			newPuzzle.WriteToDiskSimple(newPuzzle.Path);
 		}
 	}
 }

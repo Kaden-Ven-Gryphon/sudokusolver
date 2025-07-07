@@ -59,5 +59,32 @@ namespace GrpcSolver.Services
 				return reply;
 			});
 		}
+
+		/// <summary>
+		/// Imports a puzzle / creates new puzzle and writes to file
+		/// </summary>
+		/// <param name="request"></param>
+		/// <param name="context"></param>
+		/// <returns></returns>
+		public override Task<ImportReply> ImportPuzzle(ImportRequest request, ServerCallContext context)
+		{
+			_logger.LogInformation("Starting ImportPuzzle");
+			try
+			{
+                return Task.Run(() =>
+                {
+                    _fileManager.ImportNewPuzzleSimple(request.Name, request.Given.ToArray());
+                    ImportReply reply = new ImportReply();
+
+                    return reply;
+                });
+            }
+			catch (Exception ex)
+			{
+				_logger.LogError(ex, "Puzzle Import Failed");
+				return Task.FromResult(new ImportReply { Sucsess = false});
+			}
+			
+		}
 	}
 }

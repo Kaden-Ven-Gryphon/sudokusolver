@@ -14,28 +14,14 @@ namespace SudokuClient
 {
 	internal static class GlobalStaticData
 	{
-		public static ILoggerFactory LogFactory = new LoggerFactory().AddSerilog(
-			new LoggerConfiguration()
-			.MinimumLevel.Debug()
-			.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-			.Enrich.FromLogContext()
-			.WriteTo.Debug()
-			.CreateLogger());
-
-		public static string PATH = "C:\\Users\\NoxNo\\Desktop\\Projects\\SudokuSolver\\TestBoards"; 
-		
 		
 
-		public static void InitLog()
-		{
-			var LogConfig = new LoggerConfiguration()
-			.MinimumLevel.Debug()
-			.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-			.Enrich.FromLogContext()
-			.WriteTo.Debug()
-			.CreateLogger();
-			LogFactory = new LoggerFactory();
-			LogFactory.AddSerilog(LogConfig);
-		}
+		public static string PATH = "C:\\Users\\NoxNo\\Desktop\\Projects\\SudokuSolver\\TestBoards";
+
+		public static string LAST_PUZZLE_IMPORT_NAME = "";
+
+		public static string LAST_PUZZLE_IMPORT_GIVEN = "";
+
+		
 	}
 }

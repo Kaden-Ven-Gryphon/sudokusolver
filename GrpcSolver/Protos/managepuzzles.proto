@@ -9,6 +9,7 @@ service PuzzleManager {
 	// Gets list of avalible files
 	rpc GetPuzzleListAndIds (PathRequest) returns (ListReply);
 	rpc GetPuzzle (PuzzleRequest) returns (PuzzleReply);
+	rpc ImportPuzzle (ImportRequest) returns (ImportReply);
 }
 
 // The request message containing the path to use.
@@ -37,4 +38,13 @@ message PuzzleReply {
 	repeated int32 board = 7;
 	repeated int32 given = 8;
 	repeated int32 pencil_marks = 9;
+}
+
+message ImportRequest {
+	string name = 1;
+	repeated int32 given = 2;
+}
+
+message ImportReply {
+	bool sucsess = 1;
 }

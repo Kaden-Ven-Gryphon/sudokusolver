@@ -19,7 +19,8 @@
 		<Menu Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
 			<MenuItem Header="_File">
 				<MenuItem Header="_Path..." Click="Menu_Click_Path"/>
-			</MenuItem>
+                <MenuItem Header="_Import..." Click="Menu_Click_Import" />
+            </MenuItem>
 		</Menu>
 		
 
