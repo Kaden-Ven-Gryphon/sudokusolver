@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using SudokuSolver.Exceptions;
 
@@ -11,6 +13,7 @@ namespace SudokuSolver.Base
 	/// <summary>
 	/// Adds path and other file specific details to a puzzle
 	/// </summary>
+	
 	public class PuzzleFile : PuzzleBase
 	{
 		
@@ -59,6 +62,39 @@ namespace SudokuSolver.Base
 					Difficulty = 0;
 					Description = "From Old Format";
 					Stale = false;
+				}
+				else if (path.EndsWith(".json"))
+				{
+					//Then it is a json
+					var jsonSting = sr.ReadToEnd();
+					var toCopy = JsonSerializer.Deserialize<PuzzleBase>(jsonSting);
+					if (toCopy != null)
+					{
+						Id = toCopy.Id;
+						Name = toCopy.Name;
+						Description = toCopy.Description;
+						Difficulty = toCopy.Difficulty;
+						ResizeBoard(toCopy.Columns, toCopy.Rows, false);
+
+
+						_board = new int[Rows * Columns];
+						_given = new int[Rows * Columns];
+						_pencilMarks = new List<int>[Rows * Columns];
+						for (int i = 0; i < Rows; i++)
+						{
+							for (int j = 0; j< Columns; j++)
+							{
+								_pencilMarks[ConvertCordToIndex(i, j)] = new List<int>();
+								_board[ConvertCordToIndex(i, j)] = toCopy.GetCellValue(i, j);
+								if (toCopy.CellIsGiven(i, j))
+								{
+									_given[ConvertCordToIndex(i, j)] = _board[ConvertCordToIndex(i, j)];
+								}
+								_pencilMarks[ConvertCordToIndex(i, j)].AddRange(toCopy.GetCellPencilMarks(i, j));
+							}
+							
+						}
+					}
 				}
 				sr.Close();
 			}
@@ -113,6 +149,36 @@ namespace SudokuSolver.Base
 			{
 				if (sw != null) sw.Close();
 			}
+		}
+
+		public void WriteToDisk(string path)
+		{
+			StreamWriter sw = null!;
+			try
+			{
+				sw = new StreamWriter(path+".json");
+
+				string jsonString = JsonSerializer.Serialize<PuzzleBase>(this);
+
+				sw.Write(jsonString);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("FileWriting Error", ex);
+			}
+			finally
+			{
+				if (sw != null) sw.Close();
+			}
+		}
+
+		public void WriteToDisk()
+		{
+			if (Path == "" || Path == null)
+			{
+				throw new InvalidPuzzlePathException("No path is set for this puzzle file.");
+			}
+			WriteToDisk(Path);
 		}
 	}
 }

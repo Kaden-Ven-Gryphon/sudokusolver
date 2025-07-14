@@ -13,20 +13,26 @@ namespace SudokuSolver.Base
 	/// Puzzle Base class.  This is mostly a struct that is used to store the state of a puzzle
 	/// so that it can be passed to and from the grpc back end
 	/// </summary>
+	[JsonDerivedType(typeof(PuzzleFile))]
 	public class PuzzleBase
 	{
 		public int Id {  get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public int Difficulty { get; set; }
+		[JsonInclude]
 		public int Rows { get; private set; }
+		[JsonInclude]
 		public int Columns { get; private set; }
 
-        protected int[] _board;
+		[JsonInclude]
+		protected int[] _board;
+		[JsonInclude]
 		protected int[] _given;
+		[JsonInclude]
 		protected List<int>[] _pencilMarks;
 
-        public PuzzleBase(int id, string name, string description, int difficulty, int columns, int rows)
+		public PuzzleBase(int id, string name, string description, int difficulty, int columns, int rows)
 		{
 			Id = id;
 			Name = name;
@@ -35,14 +41,14 @@ namespace SudokuSolver.Base
 			Columns = columns;
 			Rows = rows;
 
-            _board = new int[Rows*Columns];
-            _given = new int[Rows * Columns];
-            _pencilMarks = new List<int>[Rows * Columns];
-            for (int i = 0; i < _pencilMarks.Length; i++)
-            {
-                _pencilMarks[i] = new List<int>();
-            }
-        }
+			_board = new int[Rows*Columns];
+			_given = new int[Rows * Columns];
+			_pencilMarks = new List<int>[Rows * Columns];
+			for (int i = 0; i < _pencilMarks.Length; i++)
+			{
+				_pencilMarks[i] = new List<int>();
+			}
+		}
 
 		public PuzzleBase() : this(0, "", "", 0, 0, 0) { }
 		public PuzzleBase(int columns, int rows) : this(0, "", "", 0, columns, rows) { }

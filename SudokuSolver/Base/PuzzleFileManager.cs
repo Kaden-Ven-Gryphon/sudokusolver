@@ -23,8 +23,8 @@
 		// Does not varify that they are valid puzzle files
 		public void ScanPath()
 		{
+			_puzzleFiles.Clear();
 			var directories = new List<string> { Path };
-			directories.AddRange(Directory.GetDirectories(Path).ToList());
 			if (directories == null) { return; }
 
 			for (int i = 0; i < directories.Count; i++)
@@ -110,7 +110,7 @@
 
 			newPuzzle.Path = Path + "\\" + puzzleName;
 
-			newPuzzle.WriteToDiskSimple(newPuzzle.Path);
+			newPuzzle.WriteToDisk(newPuzzle.Path);
 		}
 	}
 }
